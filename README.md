@@ -1,5 +1,9 @@
 # esercitazionem1
 Progetti ed esercitazioni Epicode
+> **Stato di avanzamento.** L'ambiente di laboratorio è stato configurato
+> (macchine virtuali, rete interna `intnet`, indirizzi statici). La raccolta
+> degli output e degli screenshot è in corso e verrà aggiunta a questo
+> repository.
 
 
 
