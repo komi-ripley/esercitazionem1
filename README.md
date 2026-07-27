@@ -46,8 +46,6 @@ PING 192.168.50.102 (192.168.50.102) 56(84) bytes of data.
 4 packets transmitted, 0 received, 100% packet loss, time 3210ms
 ```
 
-![Ping fallito](screenshots/01-ping-fallito.png)
-
 Perdita del 100%, ma senza nessun messaggio "Destination Host Unreachable". La differenza conta: i pacchetti arrivavano e venivano scartati in silenzio, quindi il problema era il firewall e non la rete.
 
 Verifica sulla macchina Windows:
@@ -81,8 +79,6 @@ PING 192.168.50.102 (192.168.50.102) 56(84) bytes of data.
 rtt min/avg/max/mdev = 0.544/0.692/0.826/0.115 ms
 ```
 
-![Ping riuscito](screenshots/02-ping-ok.png)
-
 Il `ttl=128` conferma che a rispondere è un host Windows (Linux parte da 64).
 
 ## Fase 2. Ricognizione con Nmap
@@ -113,8 +109,6 @@ MAC Address: 08:00:27:20:4E:6D (Oracle VirtualBox virtual NIC)
 Nmap done: 1 IP address (1 host up) scanned in 6.55 seconds
 ```
 
-![Scansione prima del blocco](screenshots/03-nmap-prima.png)
-
 Due porte aperte:
 
 - 3389 (`ms-wbt-server`), il Desktop remoto appena attivato
@@ -138,14 +132,33 @@ Regola creata da `wf.msc`, in Regole connessioni in entrata.
 | Indirizzi IP locali | Qualsiasi |
 | Indirizzi IP remoti | 192.168.50.100 |
 | Azione | Blocca la connessione |
-| Profili | Dominio, Privato, Pubblico |
+| Profili | Tutti (Dominio, Privato, Pubblico) |
 | Nome | Blocco_Kali |
 
-![Regola, scheda Ambito](screenshots/04-regola-ambito.png)
-
-![Regola, scheda Azione](screenshots/05-regola-azione.png)
-
 Il campo importante è quello degli indirizzi remoti. Gli indirizzi locali restano su "Qualsiasi": solo la sorgente viene limitata all'IP di Kali.
+
+Verifica della regola creata, da PowerShell:
+
+```
+PS> Get-NetFirewallRule -DisplayName "Blocco_Kali" | Select-Object DisplayName, Enabled, Direction, Action, Profile
+
+DisplayName : Blocco_Kali
+Enabled     : True
+Direction   : Inbound
+Action      : Block
+Profile     : Any
+```
+
+```
+PS> Get-NetFirewallRule -DisplayName "Blocco_Kali" | Get-NetFirewallAddressFilter
+
+LocalAddress  : Any
+RemoteAddress : 192.168.50.100
+```
+
+(output ridotto ai campi valorizzati)
+
+La regola è attiva, agisce sul traffico in entrata, l'azione è Block e si applica a tutti i profili. Il filtro sugli indirizzi conferma che il vincolo è solo sulla sorgente.
 
 Nuova scansione dopo l'applicazione della regola:
 
@@ -160,8 +173,6 @@ MAC Address: 08:00:27:20:4E:6D (Oracle VirtualBox virtual NIC)
 
 Nmap done: 1 IP address (1 host up) scanned in 7.48 seconds
 ```
-
-![Scansione dopo il blocco](screenshots/06-nmap-dopo.png)
 
 Tutte e 100 le porte filtrate, nessuna aperta. Prima erano due.
 
@@ -205,8 +216,6 @@ PS> Select-String -Path C:\Windows\System32\LogFiles\Firewall\pfirewall.log -Pat
 2026-07-27 22:59:59 DROP TCP 192.168.50.100 192.168.50.102 57764 5357 44 S 446729687 0 1024 - - - RECEIVE 4
 2026-07-27 22:59:59 DROP TCP 192.168.50.100 192.168.50.102 57766 5357 44 S 446860757 0 1024 - - - RECEIVE 4
 ```
-
-![Righe DROP nel log](screenshots/07-pfirewall-log.png)
 
 Formato dei campi: data, ora, azione, protocollo, IP sorgente, IP destinazione, porta sorgente, porta destinazione, dimensione, flag TCP.
 
