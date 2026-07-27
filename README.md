@@ -132,34 +132,7 @@ Le porte risultano ora `filtered` e non `closed`:
 
 Il firewall scarta i pacchetti senza rispondere, quindi Nmap non può distinguere una porta chiusa da una porta bloccata. Dal punto di vista difensivo è il comportamento preferibile: una risposta `RST` confermerebbe comunque l'esistenza del sistema.
 
-## Fase 4 — Log del firewall
 
-Configurazione: `wf.msc` → clic destro su "Windows Defender Firewall con sicurezza avanzata" → Proprietà → scheda Profilo privato → sezione Registrazione → Personalizza.
-
-- Registra pacchetti ignorati: Sì
-- Percorso: `%systemroot%\system32\LogFiles\Firewall\pfirewall.log`
-
-![Configurazione del logging](screenshots/06-logging.png)
-
-Il traffico è stato generato ripetendo la scansione da Kali. Lettura del log (PowerShell come amministratore):
-
-```
-Select-String -Path C:\Windows\System32\LogFiles\Firewall\pfirewall.log -Pattern "DROP.*192.168.50.100"
-```
-
-Il file appartiene all'account SYSTEM e non è apribile con Blocco Note avviato normalmente.
-
-Righe rilevate:
-
-```
-[INSERIRE RIGHE DROP]
-```
-
-![Righe DROP nel log](screenshots/07-pfirewall-log.png)
-
-Formato delle righe: `data ora azione protocollo ip-origine ip-destinazione porta-origine porta-destinazione`
-
-Le righe `DROP` con indirizzo di origine 192.168.50.100 confermano che i pacchetti di scansione raggiungono la macchina Windows ma vengono scartati dal firewall prima di arrivare ai servizi.
 
 ## Conclusioni
 
