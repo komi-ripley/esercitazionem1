@@ -147,6 +147,4 @@ La regola blocca esclusivamente l'indirizzo 192.168.50.100 e non tutto il traffi
 
 La misura presenta limiti evidenti: un attaccante che cambia indirizzo IP la aggira completamente, le porte restano aperte verso tutte le altre origini e la gestione manuale non è scalabile. Una strategia di difesa reale affianca a questa misura la riduzione dei servizi esposti, la segmentazione di rete e il monitoraggio continuo.
 
-La Fase 4 evidenzia la differenza tra bloccare e rilevare: senza la registrazione, l'attacco sarebbe stato fermato senza lasciare alcuna traccia. I log rendono l'evento analizzabile e costituiscono il presupposto di qualsiasi attività di incident response.
-
 Il firewall nativo di Windows, correttamente configurato, è risultato adeguato a neutralizzare una ricognizione di questo tipo senza ricorrere a software di terze parti.
